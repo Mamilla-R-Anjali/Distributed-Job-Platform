@@ -1,0 +1,98 @@
+package com.jobplatform.jobservice.controller;
+
+import com.jobplatform.jobservice.model.Job;
+import com.jobplatform.jobservice.service.JobService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Map;
+
+@RestController
+@RequestMapping("/api/jobs")
+@CrossOrigin(origins = {"http://localhost:5174","http://127.0.0.1:5174"})
+public class JobController {
+
+    private final JobService jobService;
+
+    public JobController(JobService jobService) {
+        this.jobService = jobService;
+    }
+
+    @PostMapping
+    public ResponseEntity<Job> createJob(@RequestBody Job job) {
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(jobService.createJob(job));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<Job>> getAllJobs() {
+        return ResponseEntity.ok(jobService.getAllJobs());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getJobById(@PathVariable Long id) {
+
+        Job job = jobService.getJobById(id);
+
+        if (job == null) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(Map.of(
+                            "error", "Job not found",
+                            "jobId", id
+                    ));
+        }
+
+        return ResponseEntity.ok(job);
+    }
+
+    @PutMapping("/{id}/status")
+    public ResponseEntity<?> updateJobStatus(
+            @PathVariable Long id,
+            @RequestBody Map<String, String> request) {
+
+        String status = request.get("status");
+        String result = request.get("result");
+
+        if (status == null || status.isBlank()) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(Map.of("error", "Status is required"));
+        }
+
+        if (!status.equalsIgnoreCase("PENDING")
+                && !status.equalsIgnoreCase("PROCESSING")
+                && !status.equalsIgnoreCase("COMPLETED")
+                && !status.equalsIgnoreCase("FAILED")) {
+
+            return ResponseEntity
+                    .badRequest()
+                    .body(Map.of(
+                            "error", "Invalid status",
+                            "allowedStatuses", List.of(
+                                    "PENDING",
+                                    "PROCESSING",
+                                    "COMPLETED",
+                                    "FAILED"
+                            )
+                    ));
+        }
+
+        Job updatedJob =
+                jobService.updateJobStatus(id, status, result);
+
+        if (updatedJob == null) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(Map.of(
+                            "error", "Job not found",
+                            "jobId", id
+                    ));
+        }
+
+        return ResponseEntity.ok(updatedJob);
+    }
+}
