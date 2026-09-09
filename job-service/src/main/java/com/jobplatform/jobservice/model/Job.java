@@ -26,8 +26,6 @@ public class Job {
 
     private LocalDateTime completedAt;
 
-    private Long durationMs;
-
     public Job() {
     }
 
@@ -81,13 +79,5 @@ public class Job {
 
     public void setCompletedAt(LocalDateTime completedAt) {
         this.completedAt = completedAt;
-    }
-
-    public Long getDurationMs() {
-        return durationMs;
-    }
-
-    public void setDurationMs(Long durationMs) {
-        this.durationMs = durationMs;
     }
 }

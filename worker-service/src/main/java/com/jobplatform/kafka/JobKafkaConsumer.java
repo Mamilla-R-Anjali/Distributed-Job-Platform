@@ -26,6 +26,13 @@ public class JobKafkaConsumer {
             @Value("${job.service.url:http://localhost:8080/api/jobs}")
             String jobServiceUrl,
 
+            /*
+             * Docker provides WORKER_API_KEY.
+             *
+             * Explicitly prefer the environment variable so
+             * worker-service uses the same key configured for
+             * job-service.
+             */
             @Value("${WORKER_API_KEY:${worker.api.key:CHANGE_THIS_TO_YOUR_WORKER_KEY}}")
             String workerApiKey) {
 
@@ -44,18 +51,11 @@ public class JobKafkaConsumer {
         System.out.println("========================================");
         System.out.println("        WORKER RECEIVED JOB");
         System.out.println("========================================");
-        System.out.println("Job ID       : " + job.getId());
-        System.out.println("Job Name     : " + job.getName());
-        System.out.println("Job Status   : " + job.getStatus());
-        System.out.println("Duration     : " + job.getDurationMs() + " ms");
-        System.out.println("Created At   : " + job.getCreatedAt());
+        System.out.println("Job ID     : " + job.getId());
+        System.out.println("Job Name   : " + job.getName());
+        System.out.println("Job Status : " + job.getStatus());
+        System.out.println("Created At : " + job.getCreatedAt());
         System.out.println("========================================");
-
-        updateJobStatus(
-                job.getId(),
-                "RUNNING",
-                null
-        );
 
         String result = executeWithRetry(job);
 
@@ -169,20 +169,28 @@ public class JobKafkaConsumer {
 
     private String executeJob(Job job) {
 
+        if (job.getName() != null
+                && job.getName().startsWith("FAIL-")) {
+
+            System.out.println(
+                    "INTENTIONAL FAILURE TEST for Job ID "
+                            + job.getId()
+            );
+
+            throw new RuntimeException(
+                    "Intentional failure for retry testing"
+            );
+        }
+
         System.out.println(
                 "Processing Job ID "
                         + job.getId()
                         + "..."
         );
 
-        long duration =
-                job.getDurationMs() == null
-                        ? 1000
-                        : job.getDurationMs();
-
         try {
 
-            Thread.sleep(duration);
+            Thread.sleep(1000);
 
         } catch (InterruptedException e) {
 
@@ -204,6 +212,11 @@ public class JobKafkaConsumer {
                         + "..."
         );
 
+        System.out.println(
+                "Execution Result: "
+                        + result
+        );
+
         return result;
     }
 
@@ -215,20 +228,16 @@ public class JobKafkaConsumer {
         try {
 
             String escapedResult =
-                    result == null
-                            ? null
-                            : result
+                    result
                             .replace("\\", "\\\\")
                             .replace("\"", "\\\"");
 
             String jsonBody =
                     "{\"status\":\""
                             + status
-                            + "\",\"result\":"
-                            + (escapedResult == null
-                            ? "null"
-                            : "\"" + escapedResult + "\"")
-                            + "}";
+                            + "\",\"result\":\""
+                            + escapedResult
+                            + "\"}";
 
             HttpRequest request =
                     HttpRequest.newBuilder()

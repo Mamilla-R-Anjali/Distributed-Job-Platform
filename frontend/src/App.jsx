@@ -7,7 +7,6 @@ const AUTH_URL = "/api/auth";
 function App() {
   const [jobs, setJobs] = useState([]);
   const [jobName, setJobName] = useState("");
-  const [jobDuration, setJobDuration] = useState("1000");
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
@@ -31,6 +30,7 @@ function App() {
   const [jobSearch, setJobSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
 
+  // Selected job for the Job Details drawer.
   const [selectedJob, setSelectedJob] = useState(null);
 
   const getToken = () => {
@@ -231,13 +231,13 @@ function App() {
         Array.isArray(data) ? data : []
       );
 
+      // Keep the open details drawer synchronized
+      // with the newest automatically refreshed job data.
       if (selectedJob) {
         const updatedSelectedJob = (
           Array.isArray(data) ? data : []
         ).find(
-          (job) =>
-            String(job.id) ===
-            String(selectedJob.id)
+          (job) => String(job.id) === String(selectedJob.id)
         );
 
         if (updatedSelectedJob) {
@@ -273,13 +273,6 @@ function App() {
       return;
     }
 
-    const duration = Number(jobDuration);
-
-    if (!Number.isFinite(duration) || duration <= 0) {
-      setError("Duration must be a positive number.");
-      return;
-    }
-
     try {
       setCreating(true);
       setError("");
@@ -301,7 +294,6 @@ function App() {
         },
         body: JSON.stringify({
           name: jobName.trim(),
-          durationMs: duration,
         }),
       });
 
@@ -338,7 +330,6 @@ function App() {
       }
 
       setJobName("");
-      setJobDuration("1000");
 
       await loadJobs();
     } catch (err) {
@@ -370,6 +361,7 @@ function App() {
       clearInterval(interval);
   }, [token]);
 
+  // Close the details drawer with the Escape key.
   useEffect(() => {
     if (!selectedJob) {
       return;
@@ -682,7 +674,9 @@ function App() {
     return (
       <div className="auth-page">
         <div className="auth-shell">
+
           <section className="auth-brand-panel">
+
             <div className="auth-brand-top">
               <div className="auth-brand-mark">
                 DS
@@ -694,6 +688,7 @@ function App() {
             </div>
 
             <div className="auth-brand-content">
+
               <span className="auth-kicker">
                 JOB ORCHESTRATION PLATFORM
               </span>
@@ -711,6 +706,7 @@ function App() {
               </p>
 
               <div className="auth-capabilities">
+
                 <div className="auth-capability">
                   <span className="capability-icon">
                     01
@@ -761,7 +757,9 @@ function App() {
                     </span>
                   </div>
                 </div>
+
               </div>
+
             </div>
 
             <div className="auth-brand-footer">
@@ -773,9 +771,11 @@ function App() {
                 ENGINEERING WORKSPACE
               </span>
             </div>
+
           </section>
 
           <section className="auth-form-panel">
+
             <div className="auth-mobile-brand">
               <div className="auth-brand-mark">
                 DS
@@ -793,7 +793,9 @@ function App() {
             </div>
 
             <div className="auth-form-container">
+
               <div className="auth-intro">
+
                 <span className="auth-kicker">
                   {authMode === "login"
                     ? "WELCOME BACK"
@@ -811,9 +813,11 @@ function App() {
                     ? "Access your distributed job dashboard."
                     : "Create an account to submit and monitor jobs."}
                 </p>
+
               </div>
 
               <div className="auth-tabs">
+
                 <button
                   type="button"
                   className={
@@ -843,14 +847,17 @@ function App() {
                 >
                   Register
                 </button>
+
               </div>
 
               <form
                 onSubmit={handleAuth}
                 className="auth-form"
               >
+
                 {authMode === "register" && (
                   <div className="auth-field">
+
                     <label htmlFor="auth-name">
                       Full name
                     </label>
@@ -867,10 +874,12 @@ function App() {
                       }
                       disabled={authLoading}
                     />
+
                   </div>
                 )}
 
                 <div className="auth-field">
+
                   <label htmlFor="auth-email">
                     Email address
                   </label>
@@ -887,9 +896,11 @@ function App() {
                     }
                     disabled={authLoading}
                   />
+
                 </div>
 
                 <div className="auth-field">
+
                   <div className="auth-label-row">
                     <label htmlFor="auth-password">
                       Password
@@ -912,6 +923,7 @@ function App() {
                     }
                     disabled={authLoading}
                   />
+
                 </div>
 
                 {authError && (
@@ -957,9 +969,11 @@ function App() {
                     </span>
                   )}
                 </button>
+
               </form>
 
               <div className="auth-switch">
+
                 {authMode === "login" ? (
                   <p>
                     Don't have an account?{" "}
@@ -989,6 +1003,7 @@ function App() {
                     </button>
                   </p>
                 )}
+
               </div>
 
               <div className="auth-security-note">
@@ -1001,8 +1016,11 @@ function App() {
                   protected by the platform.
                 </span>
               </div>
+
             </div>
+
           </section>
+
         </div>
       </div>
     );
@@ -1010,13 +1028,17 @@ function App() {
 
   return (
     <div className="app">
+
       <header className="topbar">
+
         <div className="topbar-brand">
+
           <div className="brand-mark">
             DS
           </div>
 
           <div className="brand-copy">
+
             <span className="brand-eyebrow">
               DISTRIBUTED SYSTEM
             </span>
@@ -1024,10 +1046,13 @@ function App() {
             <strong>
               Distributed Job Platform
             </strong>
+
           </div>
+
         </div>
 
         <div className="topbar-right">
+
           <div className="system-status">
             <span className="system-status-dot" />
 
@@ -1039,6 +1064,7 @@ function App() {
           <div className="topbar-divider" />
 
           <div className="user-menu">
+
             <div className="user-avatar">
               {userName
                 ? userName
@@ -1049,6 +1075,7 @@ function App() {
             </div>
 
             <div className="user-details">
+
               <span>
                 Signed in as
               </span>
@@ -1056,10 +1083,13 @@ function App() {
               <strong>
                 {userName}
               </strong>
+
             </div>
+
           </div>
 
           <div className="topbar-actions">
+
             <button
               type="button"
               className={
@@ -1095,14 +1125,21 @@ function App() {
             >
               Sign out
             </button>
+
           </div>
+
         </div>
+
       </header>
 
       <main className="dashboard">
+
         <section className="hero-section">
+
           <div className="hero-copy">
+
             <div className="hero-title-line">
+
               <span className="page-kicker">
                 OPERATIONS
               </span>
@@ -1111,6 +1148,7 @@ function App() {
                 <span />
                 LIVE
               </span>
+
             </div>
 
             <h1>
@@ -1121,9 +1159,11 @@ function App() {
               A live control surface for submitting,
               monitoring, and reviewing distributed workloads.
             </p>
+
           </div>
 
           <div className="hero-meta">
+
             <span>
               SYSTEM ACTIVITY
             </span>
@@ -1135,11 +1175,15 @@ function App() {
             <small>
               Automatic refresh every 3 seconds
             </small>
+
           </div>
+
         </section>
 
         <section className="operations-overview">
+
           <div className="overview-heading">
+
             <div>
               <span className="section-label">
                 OPERATIONS OVERVIEW
@@ -1153,9 +1197,11 @@ function App() {
             <span className="overview-total">
               {filteredJobs.length} visible
             </span>
+
           </div>
 
           <div className="metrics-grid">
+
             {metricCards.map((metric) => (
               <button
                 key={metric.value}
@@ -1169,7 +1215,9 @@ function App() {
                   selectMetric(metric.value)
                 }
               >
+
                 <div className="metric-top">
+
                   <span className="metric-label">
                     {metric.label}
                   </span>
@@ -1183,9 +1231,11 @@ function App() {
                       className={`metric-indicator ${metric.type}`}
                     />
                   )}
+
                 </div>
 
                 <div className="metric-main">
+
                   <strong className="metric-value">
                     {metric.number}
                   </strong>
@@ -1193,9 +1243,11 @@ function App() {
                   <span className="metric-caption">
                     {metric.caption}
                   </span>
+
                 </div>
 
                 <div className="metric-footer">
+
                   <span>
                     {metric.action}
                   </span>
@@ -1203,16 +1255,24 @@ function App() {
                   <span className="metric-arrow">
                     →
                   </span>
+
                 </div>
+
               </button>
             ))}
+
           </div>
+
         </section>
 
         <section className="workspace-grid">
+
           <div className="create-panel">
+
             <div className="panel-heading">
+
               <div className="panel-title-group">
+
                 <span className="panel-kicker">
                   NEW WORKLOAD
                 </span>
@@ -1225,19 +1285,23 @@ function App() {
                   Create a workload and send it into
                   the distributed execution pipeline.
                 </p>
+
               </div>
 
               <div className="ready-badge">
                 <span />
                 READY
               </div>
+
             </div>
 
             <form
               onSubmit={createJob}
               className="create-form"
             >
+
               <div className="create-input-area">
+
                 <label htmlFor="job-name">
                   Job name
                 </label>
@@ -1260,30 +1324,6 @@ function App() {
                   the workload in job activity.
                 </span>
 
-                <label htmlFor="job-duration">
-                  Duration
-                </label>
-
-                <input
-                  id="job-duration"
-                  type="number"
-                  min="100"
-                  step="100"
-                  placeholder="1000"
-                  value={jobDuration}
-                  onChange={(event) =>
-                    setJobDuration(
-                      event.target.value
-                    )
-                  }
-                  disabled={creating}
-                />
-
-                <span>
-                  Duration in milliseconds. Use 5000
-                  or less for completion, and above
-                  5000 to test timeout failure.
-                </span>
               </div>
 
               <button
@@ -1306,26 +1346,34 @@ function App() {
                   </span>
                 )}
               </button>
+
             </form>
 
             <div className="create-footer">
+
               <div className="create-footer-status">
+
                 <span className="live-dot" />
 
                 <strong>
                   Processing pipeline ready
                 </strong>
+
               </div>
 
               <span>
                 Jobs are handled asynchronously
                 by the distributed worker system.
               </span>
+
             </div>
+
           </div>
 
           <aside className="system-panel">
+
             <div className="system-panel-header">
+
               <div>
                 <span className="panel-kicker">
                   EXECUTION FLOW
@@ -1339,6 +1387,7 @@ function App() {
               <span className="system-live">
                 LIVE
               </span>
+
             </div>
 
             <p className="system-panel-description">
@@ -1347,7 +1396,9 @@ function App() {
             </p>
 
             <div className="pipeline">
+
               <div className="pipeline-step">
+
                 <div className="pipeline-marker">
                   <span className="pipeline-number">
                     01
@@ -1363,11 +1414,13 @@ function App() {
                     Request accepted
                   </strong>
                 </div>
+
               </div>
 
               <div className="pipeline-line" />
 
               <div className="pipeline-step">
+
                 <div className="pipeline-marker">
                   <span className="pipeline-number">
                     02
@@ -1383,11 +1436,13 @@ function App() {
                     Event queued
                   </strong>
                 </div>
+
               </div>
 
               <div className="pipeline-line" />
 
               <div className="pipeline-step">
+
                 <div className="pipeline-marker">
                   <span className="pipeline-number">
                     03
@@ -1403,11 +1458,13 @@ function App() {
                     Worker processing
                   </strong>
                 </div>
+
               </div>
 
               <div className="pipeline-line" />
 
               <div className="pipeline-step">
+
                 <div className="pipeline-marker">
                   <span className="pipeline-number">
                     04
@@ -1423,13 +1480,18 @@ function App() {
                     Result available
                   </strong>
                 </div>
+
               </div>
+
             </div>
+
           </aside>
+
         </section>
 
         {error && (
           <div className="dashboard-error">
+
             <span className="error-icon">
               !
             </span>
@@ -1437,17 +1499,22 @@ function App() {
             <span>
               {error}
             </span>
+
           </div>
         )}
 
         <section className="jobs-section">
+
           <div className="jobs-heading">
+
             <div>
+
               <span className="page-kicker">
                 JOB ACTIVITY
               </span>
 
               <div className="jobs-title-row">
+
                 <h2>
                   {statusFilter === "ALL"
                     ? "Recent jobs"
@@ -1463,6 +1530,7 @@ function App() {
                 <span className="jobs-count">
                   {filteredJobs.length} of {jobs.length}
                 </span>
+
               </div>
 
               <p>
@@ -1476,11 +1544,15 @@ function App() {
                   ? "Workloads currently being processed by workers."
                   : "Search and monitor workloads submitted to the distributed processing system."}
               </p>
+
             </div>
+
           </div>
 
           <div className="jobs-toolbar">
+
             <div className="search-box">
+
               <span className="search-icon">
                 /
               </span>
@@ -1509,9 +1581,11 @@ function App() {
                   ×
                 </button>
               )}
+
             </div>
 
             <div className="status-filters">
+
               {filterOptions.map((filter) => (
                 <button
                   key={filter.value}
@@ -1536,13 +1610,17 @@ function App() {
                   <span className="filter-label">
                     {filter.label}
                   </span>
+
                 </button>
               ))}
+
             </div>
+
           </div>
 
           {loading ? (
             <div className="table-state">
+
               <div className="state-loader" />
 
               <strong>
@@ -1552,9 +1630,11 @@ function App() {
               <span>
                 Retrieving the latest job activity...
               </span>
+
             </div>
           ) : jobs.length === 0 ? (
             <div className="table-state">
+
               <div className="state-icon">
                 —
               </div>
@@ -1567,9 +1647,11 @@ function App() {
                 Submit your first job to begin
                 monitoring distributed activity.
               </span>
+
             </div>
           ) : filteredJobs.length === 0 ? (
             <div className="table-state">
+
               <div className="state-icon">
                 ?
               </div>
@@ -1593,13 +1675,19 @@ function App() {
               >
                 Reset filters
               </button>
+
             </div>
           ) : (
             <div className="jobs-table-card">
+
               <div className="table-scroll">
+
                 <table>
+
                   <thead>
+
                     <tr>
+
                       <th className="column-id">
                         ID
                       </th>
@@ -1623,10 +1711,13 @@ function App() {
                       <th className="column-result">
                         Result
                       </th>
+
                     </tr>
+
                   </thead>
 
                   <tbody>
+
                     {filteredJobs.map((job) => (
                       <tr
                         key={job.id}
@@ -1647,14 +1738,19 @@ function App() {
                         }}
                         aria-label={`Open details for job ${job.id}`}
                       >
+
                         <td>
+
                           <span className="table-job-id">
                             #{job.id}
                           </span>
+
                         </td>
 
                         <td>
+
                           <div className="job-cell">
+
                             <span className="job-name">
                               {job.name}
                             </span>
@@ -1662,10 +1758,13 @@ function App() {
                             <span className="job-reference">
                               JOB-{String(job.id).padStart(4, "0")}
                             </span>
+
                           </div>
+
                         </td>
 
                         <td>
+
                           <span
                             className={
                               `status ${getStatusClass(
@@ -1683,36 +1782,48 @@ function App() {
 
                             {job.status}
                           </span>
+
                         </td>
 
                         <td>
+
                           <span className="table-date">
                             {formatDateTime(
                               job.createdAt
                             )}
                           </span>
+
                         </td>
 
                         <td>
+
                           <span className="table-date">
                             {formatDateTime(
                               job.completedAt
                             )}
                           </span>
+
                         </td>
 
                         <td>
+
                           <span className="table-result">
                             {job.result || "-"}
                           </span>
+
                         </td>
+
                       </tr>
                     ))}
+
                   </tbody>
+
                 </table>
+
               </div>
 
               <div className="table-footer">
+
                 <span>
                   Showing {filteredJobs.length} job
                   {filteredJobs.length === 1
@@ -1723,10 +1834,14 @@ function App() {
                 <span>
                   Select a job to inspect details
                 </span>
+
               </div>
+
             </div>
           )}
+
         </section>
+
       </main>
 
       {selectedJob && (
@@ -1746,7 +1861,9 @@ function App() {
             aria-modal="true"
             aria-labelledby="job-details-title"
           >
+
             <div className="job-details-header">
+
               <div>
                 <span className="panel-kicker">
                   WORKLOAD INSPECTION
@@ -1765,10 +1882,13 @@ function App() {
               >
                 ×
               </button>
+
             </div>
 
             <div className="job-details-body">
+
               <div className="job-details-identity">
+
                 <div className="job-details-id">
                   <span>
                     JOB ID
@@ -1796,9 +1916,11 @@ function App() {
 
                   {selectedJob.status}
                 </span>
+
               </div>
 
               <div className="job-details-name-block">
+
                 <span>
                   JOB NAME
                 </span>
@@ -1810,10 +1932,13 @@ function App() {
                 <small>
                   JOB-{String(selectedJob.id).padStart(4, "0")}
                 </small>
+
               </div>
 
               <div className="job-details-facts">
+
                 <div className="job-detail-fact">
+
                   <span>
                     CREATED
                   </span>
@@ -1823,9 +1948,11 @@ function App() {
                       selectedJob.createdAt
                     )}
                   </strong>
+
                 </div>
 
                 <div className="job-detail-fact">
+
                   <span>
                     COMPLETED
                   </span>
@@ -1835,11 +1962,15 @@ function App() {
                       selectedJob.completedAt
                     )}
                   </strong>
+
                 </div>
+
               </div>
 
               <div className="job-details-section">
+
                 <div className="job-details-section-heading">
+
                   <span>
                     PROCESSING LIFECYCLE
                   </span>
@@ -1847,9 +1978,11 @@ function App() {
                   <small>
                     Current workload state
                   </small>
+
                 </div>
 
                 <div className="job-lifecycle">
+
                   {(() => {
                     const lifecycle =
                       getJobLifecycle(selectedJob);
@@ -1967,11 +2100,15 @@ function App() {
                       </>
                     );
                   })()}
+
                 </div>
+
               </div>
 
               <div className="job-details-section">
+
                 <div className="job-details-section-heading">
+
                   <span>
                     EXECUTION RESULT
                   </span>
@@ -1979,6 +2116,7 @@ function App() {
                   <small>
                     Returned by the processing system
                   </small>
+
                 </div>
 
                 <div
@@ -2000,10 +2138,13 @@ function App() {
                     </span>
                   )}
                 </div>
+
               </div>
+
             </div>
 
             <div className="job-details-footer">
+
               <span>
                 Live data refreshes automatically
               </span>
@@ -2015,10 +2156,13 @@ function App() {
               >
                 Close details
               </button>
+
             </div>
+
           </aside>
         </div>
       )}
+
     </div>
   );
 }

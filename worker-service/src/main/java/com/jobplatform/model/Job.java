@@ -12,17 +12,14 @@ public class Job {
 
     private LocalDateTime createdAt;
 
-    private Long durationMs;
-
     public Job() {
     }
 
-    public Job(Long id, String name, String status, LocalDateTime createdAt, Long durationMs) {
+    public Job(Long id, String name, String status, LocalDateTime createdAt) {
         this.id = id;
         this.name = name;
         this.status = status;
         this.createdAt = createdAt;
-        this.durationMs = durationMs;
     }
 
     public Long getId() {
@@ -57,14 +54,6 @@ public class Job {
         this.createdAt = createdAt;
     }
 
-    public Long getDurationMs() {
-        return durationMs;
-    }
-
-    public void setDurationMs(Long durationMs) {
-        this.durationMs = durationMs;
-    }
-
     @Override
     public String toString() {
         return "Job{" +
@@ -72,7 +61,6 @@ public class Job {
                 ", name='" + name + '\'' +
                 ", status='" + status + '\'' +
                 ", createdAt=" + createdAt +
-                ", durationMs=" + durationMs +
                 '}';
     }
 }
