@@ -111,7 +111,7 @@ public class JobController {
         }
 
         if (!status.equalsIgnoreCase("PENDING")
-                && !status.equalsIgnoreCase("PROCESSING")
+                && !status.equalsIgnoreCase("RUNNING")
                 && !status.equalsIgnoreCase("COMPLETED")
                 && !status.equalsIgnoreCase("FAILED")) {
 
@@ -123,7 +123,7 @@ public class JobController {
                             "allowedStatuses",
                             List.of(
                                     "PENDING",
-                                    "PROCESSING",
+                                    "RUNNING",
                                     "COMPLETED",
                                     "FAILED"
                             )
