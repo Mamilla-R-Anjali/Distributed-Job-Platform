@@ -1,7 +1,9 @@
 package com.jobplatform.jobservice.model;
 
 import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Entity
 @Table(name = "jobs")
@@ -30,7 +32,9 @@ public class Job {
     public Job(String name, String status) {
         this.name = name;
         this.status = status;
-        this.createdAt = LocalDateTime.now();
+        this.createdAt = LocalDateTime.now(
+                ZoneId.of("Asia/Kolkata")
+        );
     }
 
     public Long getId() {

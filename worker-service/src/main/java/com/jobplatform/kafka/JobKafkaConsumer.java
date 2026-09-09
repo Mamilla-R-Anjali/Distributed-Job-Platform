@@ -1,4 +1,3 @@
-
 package com.jobplatform.workerservice.kafka;
 
 import com.jobplatform.workerservice.model.Job;
@@ -17,25 +16,28 @@ public class JobKafkaConsumer {
     private static final int MAX_RETRIES = 3;
     private static final long JOB_TIMEOUT_MS = 5000;
 
-    /*
-     * Reads the Job Service URL from application.properties.
-     *
-     * Local:
-     * job.service.url=http://localhost:8080/api/jobs
-     *
-     * Docker:
-     * job.service.url=http://job-service:8080/api/jobs
-     */
     private final String jobServiceUrl;
+    private final String workerApiKey;
 
     private final HttpClient httpClient =
             HttpClient.newHttpClient();
 
     public JobKafkaConsumer(
             @Value("${job.service.url:http://localhost:8080/api/jobs}")
-            String jobServiceUrl) {
+            String jobServiceUrl,
+
+            /*
+             * Docker provides WORKER_API_KEY.
+             *
+             * Explicitly prefer the environment variable so
+             * worker-service uses the same key configured for
+             * job-service.
+             */
+            @Value("${WORKER_API_KEY:${worker.api.key:CHANGE_THIS_TO_YOUR_WORKER_KEY}}")
+            String workerApiKey) {
 
         this.jobServiceUrl = jobServiceUrl;
+        this.workerApiKey = workerApiKey;
     }
 
     @KafkaListener(
@@ -167,15 +169,6 @@ public class JobKafkaConsumer {
 
     private String executeJob(Job job) {
 
-        /*
-         * FAILURE TEST
-         *
-         * A job whose name starts with "FAIL-"
-         * will intentionally fail.
-         *
-         * All other jobs continue to execute normally.
-         */
-
         if (job.getName() != null
                 && job.getName().startsWith("FAIL-")) {
 
@@ -188,10 +181,6 @@ public class JobKafkaConsumer {
                     "Intentional failure for retry testing"
             );
         }
-
-        /*
-         * Normal simulated job execution.
-         */
 
         System.out.println(
                 "Processing Job ID "
@@ -263,6 +252,10 @@ public class JobKafkaConsumer {
                             .header(
                                     "Content-Type",
                                     "application/json"
+                            )
+                            .header(
+                                    "X-Worker-Key",
+                                    workerApiKey
                             )
                             .PUT(
                                     HttpRequest.BodyPublishers

@@ -1,4 +1,3 @@
-
 package com.jobplatform.jobservice.service;
 
 import com.jobplatform.jobservice.kafka.JobKafkaProducer;
@@ -7,6 +6,7 @@ import com.jobplatform.jobservice.repository.JobRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 
 @Service
@@ -33,7 +33,11 @@ public class JobService {
         }
 
         if (job.getCreatedAt() == null) {
-            job.setCreatedAt(LocalDateTime.now());
+            job.setCreatedAt(
+                    LocalDateTime.now(
+                            ZoneId.of("Asia/Kolkata")
+                    )
+            );
         }
 
         Job savedJob = jobRepository.save(job);
@@ -90,7 +94,11 @@ public class JobService {
         if ("COMPLETED".equalsIgnoreCase(status)
                 || "FAILED".equalsIgnoreCase(status)) {
 
-            job.setCompletedAt(LocalDateTime.now());
+            job.setCompletedAt(
+                    LocalDateTime.now(
+                            ZoneId.of("Asia/Kolkata")
+                    )
+            );
         }
 
         Job updatedJob = jobRepository.save(job);
